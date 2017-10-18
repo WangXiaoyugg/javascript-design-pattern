@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Singleton</title>
+</head>
+<body>
+	<button id='login'>登录</button>
+<script>
+// var CreateDiv = (function(){
+// 	var instance;
+
+// 	var CreateDiv = function(html){
+// 		if(instance){
+// 			return instance
+// 		}
+// 		this.html = html;
+// 		this.init();
+// 		return instance = this;
+// 	}
+
+// 	CreateDiv.prototype.init = function(){
+// 		var div = document.createElement('div');
+// 		div.innerHTML = this.html;
+// 		document.body.appendChild(div);
+// 	}
+// 	return CreateDiv;
+// })()
+// var a = new CreateDiv('sev1')
+// var b = new CreateDiv('sev2')
+
+// alert(a === b);
+
+// var CreateDiv = function(html){
+// 	this.html = html;
+// 	this.init()
+// }
+
+// CreateDiv.prototype.init = function(){
+// 	var div = document.createElement('div')
+// 	div.innerHTML = this.html;
+// 	document.body.appendChild(div);
+// };
+
+// var proxySingletonCreateDiv = (function(){
+// 	var instance ;
+
+// 	return function(html){
+// 		if(!instance){
+// 			instance = new CreateDiv(html);
+// 		}
+// 		return instance;
+// 	}
+// })()
+
+// var a = new proxySingletonCreateDiv('sev1');
+// var b = new proxySingletonCreateDiv('sev2');
+// alert(a === b)
+
+// var MyApp = {}
+// MyApp.namespace = function(name){
+// 	var parts = name.split('.')
+// 	var current = MyApp;
+// 	for(var i in parts){
+// 		console.log('current',current)
+// 		if(!current[parts[i]]){
+// 			current[parts[i]] = {}
+// 		}
+// 		current = current[parts[i]]
+// 	}
+// }
+// MyApp.namespace('event')
+// MyApp.namespace('dom.style')
+
+// var loginLayer = (function(){
+// 	var div = document.createElement('div');
+// 	div.innerHTML = '我是登录浮窗'
+// 	div.style.display = 'none'
+// 	document.body.appendChild(div)
+// 	return div;
+// })()
+
+// document.getElementById('login').onclick = function(){
+// 	loginLayer.style.display = 'block';
+// }
+
+// var createLoginLayer =(function(){
+// 	var div;
+// 	return function(){
+// 		if(!div){
+// 			div = document.createElement('div')
+// 			div.innerHTML = '我是登录浮窗'
+// 			div.style.display = 'none';
+// 			document.body.appendChild(div)
+// 		}
+// 		return div;
+// 	}
+// })()
+
+// document.getElementById('login').onclick = function(){
+// 	var loginLayer = createLoginLayer();
+// 	loginLayer.style.display = 'block';
+// }
+
+
+var getSingle = function(fn){
+	var result;
+	return function(){
+		return result || (result = fn.apply(this,arguments))
+	}
+}
+
+var createLoginLayer = function(){
+	var div = document.createElement('div');
+	div.innerHTML = '我是登录窗'
+	div.style.display = 'none'
+	document.body.appendChild(div)
+	return div;
+}
+
+var createSingleLoginLayer = getSingle(createLoginLayer);
+
+document.getElementById('login').onclick = function(){
+	var loginLayer = createSingleLoginLayer();
+	loginLayer.style.display = 'block';
+}
+
+// var createSingleIframe = getSingle( function(){
+// 	var iframe = document.createElement ( 'iframe' );
+// 	document.body.appendChild( iframe );
+// 	return iframe;
+// });
+
+// document.getElementById( 'login' ).onclick = function(){ 
+// 	var loginLayer = createSingleIframe();
+// 	loginLayer.src = 'http://baidu.com';
+// };
+
+var bindEvent = getSingle(function(){
+	document.getElementById('login').onclick = function(){
+		console.log('click')
+	}
+	return true;
+})
+
+var render = function(){console.log('开始渲染列表'); bindEvent()};
+
+render()
+render()
+render();
+</script>	
+</body>
+</html>
