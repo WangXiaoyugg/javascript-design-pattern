@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>strategy</title>
+</head>
+<body>
+<!-- <div style="position: absolute;background: blue" id=div>我是div</div>	 -->
+
+<form action="" id=registForm method="post">
+	<p>请输入用户名 ： <input type="text" name=username></p>
+	<p>请输入密码	  ： <input type="text" name=password></p>
+	<p>请输手机号码 ： <input type="text" name=phoneNumber></p>
+	<p><button>提交</button></p>
+</form>
+<script>
+
+//表单验证的一般方法
+// var registForm = document.getElementById('registForm');
+
+// registForm.onsubmit = function(){
+// 	if(registForm.username.value === ''){
+// 		alert('用户名不能为空')
+// 		return false;
+// 	}
+// 	if(registForm.password.value.length < 6){
+// 		alert('密码长度不能小于6位')
+// 		return false;
+// 	}
+// 	if( !/^1[3|5|8][0-9]{9}$/.test(registForm.phoneNumber.value)){
+// 		alert('手机号码格式不正确')
+// 		return false;
+// 	}
+// }
+
+var strategies = {
+	isNonEmpty:function(value,errMsg){
+		if(value === '') return errMsg
+	},
+	minLength:function(value,length,errMsg){
+		if(value.length < length ) return errMsg;
+	},
+	isMobile:function(value,errMsg){
+		if(!/^1[3|5|8][0-9]{9}$/.test(value)) return errMsg;
+	}
+}
+
+var Validator = function(){
+	this.cache = []; //保存校验规则
+}
+
+Validator.prototype.add = function(dom,rules){
+	var self = this;
+	for(var i=0,rule;rule = rules[i++];){
+		(function(rule){
+			var strategyAry = rule.strategy.split(':');
+			var errorMsg = rule.errMsg;
+			self.cache.push(function(){
+				var strategy = strategyAry.shift();
+				strategy.unshift(dom,value)
+				strategy.push(errorMsg)
+				return strategies[strategy].apply(dom,strategyAry);
+			})(rule)
+		})
+	}
+};
+
+Validator.prototype.start = function(){
+	for(var i=0,validatorFunc;validatorFunc = this.cache[i++];){
+		var msg = validatorFunc();
+		if(msg){
+			return msg;
+		}
+	}
+};
+
+var validatorFunc = function(){
+	var validator = new Validator();
+
+	// validator.add(registForm.username,'isNonEmpty','用户名不能为空');
+	validator.add(registForm.username,[{
+		strategy:'isNonEmpty',
+		errMsg:'用户名不能为空'
+	},{
+		strategy:'minLength:6',
+		errMsg:'用户名长度不能小于6位'
+	}]);
+
+	// validator.add(registForm.password,'minLength:6','密码长度不能小于6位')
+	// validator.add(registForm.phoneNumber,'isMobile','手机号码格式不正确')
+
+	var errMsg = validator.start()
+	return errMsg;
+}
+
+var registForm = document.getElementById('registForm')
+registForm.onsubmit = function(){
+	var errMsg = validatorFunc();
+	if(errMsg){
+		alert(errMsg);
+		return false;
+	}
+}
+
+
+// Validator.prototype.add = function(dom,rule,errorMsg){
+// 	var array = rule.split(':');
+// 	this.cache.push(function(){
+// 		var strategy = array.shift();
+// 		array.unshift(dom.value); //把input的值添加进参数列表
+// 		array.push(errorMsg);
+// 		return strategies[strategy].apply(dom,array);
+// 	})
+// }
+
+
+
+
+// // t 消耗的时间 ，b 原始位置 c 小球的目标位置 d 动画的持续时间
+// var tween = {
+// 	linear:function(t,b,c,d){
+// 		return c * t /d + b
+// 	},
+// 	easeIn:function(t,b,c,d){
+// 		return c * ( t /= d)  * t + b
+// 	},
+// 	strongEaseIn: function(t, b, c, d){
+// 		return c * ( t /= d ) * t * t * t
+// 	},
+// 	strongEaseOut: function(t, b, c, d){
+// 		return c * ( ( t = t / d - 1) * t * t * t * t +1) +b
+// 	},
+// 	sineaseIn: function( t, b, c, d ){
+// 		return c * ( t /= d) * t * t + b 
+// 	},
+// 	sineaseOut: function(t,b,c,d){
+// 		return c * ( ( t = t / d - 1) * t * t + 1 ) + b;
+// 	} 
+// }
+
+// var Animate = function(dom){
+// 	this.dom = dom;
+// 	this.startTime = 0;
+// 	this.startPos = 0;
+// 	this.endPos = 0;
+// 	this.propertyName = null;
+// 	this.easing = null;
+// 	this.duration = null;
+// }
+
+// Animate.prototype.start = function(propertyName,endPos,duration,easing){
+// 	this.startTime = +new Date();
+// 	this.startPos = this.dom.getBoundingClientRect()[propertyName];
+// 	this.propertyName = propertyName;
+// 	this.endPos = endPos
+// 	this.duration = duration
+// 	this.easing = easing
+
+// 	var self = this;
+// 	var timeId = setInterval(function(){
+// 		if(self.step() === false){
+// 			clearInterval(timeId)
+// 		}
+// 	},19)
+// }
+
+// Animate.prototype.step = function(){
+// 	var t = +new Date();
+// 	if(t >= this.startTime + this.duration){
+// 		this.update(this.endPos)
+// 		return false;
+// 	}
+
+// 	var pos = this.easing(t - this.startTime, this.startPos,this.endPos - this.startPos,this.duration);
+
+// 	this.update(pos);
+// }
+
+// Animate.prototype.update = function(pos){
+// 	this.dom.style[this.propertyName] = pos + 'px'
+// }
+
+// var div = document.getElementById('div')
+// var animate = new Animate(div)
+
+// animate.start('left',500,3000,tween.linear)
+</script>
+</body>
+</html>
