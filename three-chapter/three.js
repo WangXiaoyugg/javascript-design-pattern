@@ -526,6 +526,51 @@ var renderFriendList = timeChunk(array,function(n){
 
 renderFriendList();
 
+//惰性加载函数
+//函数缺点没吃调用都会执行if 条件分支，开销较大
+var addEvent = function(elem,type,handler){
+	if(window.addEventListener){
+		return elem.addEventListener(type,handler,false);
+	}
+	if(window.attachEvent){
+		return elem.attachEvent('on'+type,handler)
+	}
+}
 
+//嗅探浏览器的操作提前到代码加载的时候，在代码加载的时候就立刻进行一次判断
+//缺点 从头到尾都没有使用过 addEvent 函数，这样看
+// 来，前一次的浏览器嗅探就是完全多余的操作，而且这也会稍稍延长页面 ready 的时间
+var addEvent = (function(){
+	if(window.addEventListener){
+		return function(elem,type,handler){
+			elem.addEventListener(type,handler,false);
+		}
+	}
+	if(window.attachEvent){
+		return function(elem,type,handler){
+			elem.attachEvent('on'+type,handler)
+		}
+	}
 
+})()
+
+//惰性函数
+var addEvent = function(elem,type,handler){
+	if(window.addEventListener){
+		//重写 addEvent
+		addEvent = function(elem,type,handler){
+			elem.addEventListener(type,handler,false)
+		}
+	}else if(window.attachEvent){
+		addEvent = function(elem,type,handler){
+			elem.addEventListener('on'+type,handler);
+		}
+	}
+
+	addEvent(elem,type,handler)
+}
+
+var div = document.getElementById('div1')
+addEvent(div,'click',() => {console.log(1)})
+addEvent(div, 'click', () => {console.log(2)})
 
