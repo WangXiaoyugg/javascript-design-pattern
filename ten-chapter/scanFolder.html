@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>扫描文件夹</title>
+</head>
+<body>
+<script>
+
+var Floder = function (name) {
+	this.name = name;
+	this.files = [];//存储文件
+	this.parent = null ; //引用父节点
+}
+
+Floder.prototype.add = function(file){
+	file.parent = this; //设置父对象
+	this.files.push(file)
+}
+
+Floder.prototype.scan = function(){
+	console.log('考试扫描文件夹 '+ this.name);
+	for(var i=0,file,files=this.files;file = files[i++];){
+		file.scan();
+	}
+}
+
+Floder.prototype.remove = function(){
+	if(!this.parent){ //根节点或者树外的游离节点
+		return;
+	}
+	for(var files = this.parent.files,l = files.length-1;l>=0;l--){
+		var file = files[l]
+		if(file === this){
+			files.splice(l,1)
+		}
+	}
+}
+
+
+
+var File = function(name){
+	this.name = name;
+	this.parent = null;
+}
+
+File.prototype.add = function(){
+	throw new Error('文件下面不能在添加文件')
+}
+
+File.prototype.scan = function(){
+	console.log('开始扫描文件：' + this.name);
+}
+
+File.prototype.remove = function(){
+	if(!this.parent){
+		return;
+	}
+	for(var files=this.parent.files,l=files.length - 1; l>=0;l--){
+		var file = files[l]
+		if(file === this){
+			files.splice(l,1)
+		}
+	}
+
+}
+//demo2
+var folder = new Floder('学习资料')
+var folder1 = new Floder('javacript')
+var file1 = new File('精通jQuery')
+folder1.add(new File('javasript 高级程序设计'))
+folder.add(folder1)
+folder.add(file1);
+folder1.remove();
+folder.scan();
+
+// demo1
+// var folder = new Floder('学习资料')
+// var folder1 = new Floder('javacript')
+// var folder2 = new Floder('jQuery')
+
+// var file3 = new File('javacript 设计模式')
+// var file1 = new File('精通jQuery')
+// var file2 = new File('重构和模式')
+
+// folder1.add(file1);
+// folder2.add(file2);
+
+// folder.add(folder1)
+// folder.add(folder2)
+// folder.add(file3);
+
+// //需求是把移动硬盘里的文件和文件夹都复制到这棵树中
+// var folder3 = new Floder('Nodejs')
+// var file4 = new File('nodejs权威指南')
+// folder3.add(file4);
+// var file5 = new File('javascript 语言精髓和编程实践')
+// folder.add(folder3)
+// folder.add(file5);
+
+// folder.scan();
+
+</script>	
+</body>
+</html>
