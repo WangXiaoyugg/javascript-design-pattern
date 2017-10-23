@@ -1,0 +1,34 @@
+<html>
+<title>demo1</title>
+<script>
+var plane = {
+	fire:function(){
+		console.log('emit bullet')
+	}
+}
+
+var missileDecorator = function(){
+	console.log('emit missile')
+}
+
+var atomDecorator = function(){
+	console.log('emit atom');
+}
+
+var fire1 = plane.fire;
+
+plane.fire = function(){
+	fire1();
+	missileDecorator()
+}
+
+var fire2 = plane.fire
+
+plane.fire = function(){
+	fire2();
+	atomDecorator();
+}
+
+plane.fire();
+</script>
+</html>

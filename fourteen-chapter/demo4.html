@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>demo4</title>
+</head>
+<body>
+<form name='form'>
+	用户名: <input type="text" name="username">
+	密码  : <input type="text" name='password'>
+	<input type="button" value="提交" name="submitBtn">
+</form>	
+<script>
+	var username = document.form.username;
+	var password = document.form.password;
+	var submitBtn = document.form.submitBtn;
+
+	// var formSubmit = function () {
+		
+	// 	if(username.value === ''){
+	// 		return alert('username can not be empty');
+	// 	}
+
+	// 	if(password.value === ''){
+	// 		return alert('password can not be empty');
+	// 	}
+
+	// 	var param = {
+	// 		username:username.value,
+	// 		password:password.value
+	// 	}
+
+	// 	ajax('http://xxx.com/login',param);//ajax 具体实现省略
+	// }	
+
+	// var ajax = function(url,param){
+	// 	console.log(url);
+	// 	console.log(param);
+	// }
+
+	// submitBtn.onclick = function(){
+	// 	formSubmit()
+	// }
+
+	// //分离校验输入和提交 ajax 请求的代码
+	// // 把校验输入的逻辑放到 validata 函数中，并且约定当 validata 函数返回 false 的时候，表示校验未通过
+
+	// var validata = function(){
+	// 	if(username.value === ''){
+	// 		alert('username can not be empty');
+	// 		return false;
+	// 	}
+
+	// 	if(password.value === ''){
+	// 		alert('password can not be empty');
+	// 		return false;
+	// 	}
+	// }
+
+	// var formSubmit = function(){
+	// 	if(validata() === false){
+	// 		return false;
+	// 	}
+
+	// 	var param = {
+	// 		username:username.value,
+	// 		password:password.value
+	// 	}
+
+	// 	ajax('http://xxx.com/login',param);//ajax 具体实现省略
+
+	// }
+
+	//进一步优化代码，使得validata 和 formSubmit 完全分开；
+	// 改写Function.prototype.before，如果 beforefn 的执行结果返回 false，表示不再执行后面的原函数
+	Function.prototype.before = function(beforefn){
+		var __self = this;
+		return function(){
+			if(beforefn.apply(this,arguments) === false){
+				return;
+			}
+			return __self.apply(this,arguments);
+		}
+	};
+
+	var validata = function(){
+		if(username.value === ''){
+			alert('username can not be empty');
+			return false;
+		}
+
+		if(password.value === ''){
+			alert('password can not be empty');
+			return false;
+		}
+	}
+
+	var ajax = function(url,param){
+		console.log(url);
+		console.log(param);
+	}
+
+	var formSubmit = function(){
+
+		var param = {
+			username:username.value,
+			password:password.value
+		}
+
+		ajax('http://xxx.com/login',param);//ajax 具体实现省略
+
+	}
+
+	formSubmit = formSubmit.before(validata);
+
+	submitBtn.onclick = function(){
+		formSubmit()
+	}
+</script>
+</body>
+</html>
